@@ -20,7 +20,6 @@ const gallery = document.querySelector('.gallery');
 const btnLoadMore = document.querySelector('.load-btn');
 
 searchForm.addEventListener('submit', async e => {
-  showLoader();
   e.preventDefault();
   query = e.target.elements.query.value.trim();
   gallery.innerHTML = '';
@@ -48,6 +47,7 @@ searchForm.addEventListener('submit', async e => {
     return;
   }
   checkBtnStatus();
+  showLoader();
 
   try {
     const obj = await getImages(query);
