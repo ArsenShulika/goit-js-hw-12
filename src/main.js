@@ -1,8 +1,5 @@
 'use strict';
 
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
-
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
@@ -21,28 +18,10 @@ const btnLoadMore = document.querySelector('.load-btn');
 
 searchForm.addEventListener('submit', async e => {
   e.preventDefault();
+  hideLoadMore();
   query = e.target.elements.query.value.trim();
   gallery.innerHTML = '';
   currentPage = 1;
-  const obj = await getImages(query, currentPage);
-  maxPage = Math.ceil(obj.totalHits / pageSize);
-  checkBtnStatus();
-
-  btnLoadMore.addEventListener('click', onLoadMoreClick);
-  async function onLoadMoreClick() {
-    if (currentPage <= maxPage) {
-      showLoader();
-      const obj = await getImages(query, ++currentPage);
-      renderGallery(obj.hits);
-      checkBtnStatus();
-      hideLoader();
-    }
-    iziToast.error({
-      title: 'Error',
-      message: "We're sorry, but you've reached the end of search results.",
-      position: 'topRight',
-    });
-  }
 
   if (!query) {
     hideLoadMore();
@@ -53,11 +32,11 @@ searchForm.addEventListener('submit', async e => {
     });
     return;
   }
-  checkBtnStatus();
   showLoader();
 
   try {
-    const obj = await getImages(query);
+    const obj = await getImages(query, currentPage);
+    maxPage = Math.ceil(obj.totalHits / pageSize);
     if (obj.hits.length === 0) {
       hideLoader();
       iziToast.error({
@@ -68,7 +47,6 @@ searchForm.addEventListener('submit', async e => {
       });
       return;
     }
-
     renderGallery(obj.hits);
   } catch (error) {
     hideLoadMore();
@@ -80,8 +58,18 @@ searchForm.addEventListener('submit', async e => {
         'Sorry, there are no images matching your search query. Please, try again!',
     });
   }
+  checkBtnStatus();
   hideLoader();
 });
+
+btnLoadMore.addEventListener('click', onLoadMoreClick);
+async function onLoadMoreClick() {
+  showLoader();
+  const obj = await getImages(query, ++currentPage);
+  renderGallery(obj.hits);
+  checkBtnStatus();
+  hideLoader();
+}
 
 function showLoader() {
   loader.classList.remove('hidden');
@@ -102,6 +90,11 @@ function hideLoadMore() {
 function checkBtnStatus() {
   if (currentPage >= maxPage) {
     hideLoadMore();
+    iziToast.error({
+      title: 'Error',
+      message: "We're sorry, but you've reached the end of search results.",
+      position: 'topRight',
+    });
   } else {
     showLoadMore();
   }
