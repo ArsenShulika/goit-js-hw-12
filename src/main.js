@@ -54,8 +54,7 @@ searchForm.addEventListener('submit', async e => {
     iziToast.error({
       title: 'Error',
       position: 'topRight',
-      message:
-        'Sorry, there are no images matching your search query. Please, try again!',
+      message: 'Sorry, your query is not correct!',
     });
   }
   checkBtnStatus();
@@ -69,6 +68,12 @@ async function onLoadMoreClick() {
   renderGallery(obj.hits);
   checkBtnStatus();
   hideLoader();
+  const elem = document.querySelector('.rectangle');
+  const rect = elem.getBoundingClientRect();
+  window.scrollBy({
+    top: rect.height * 2,
+    behavior: 'smooth',
+  });
 }
 
 function showLoader() {
