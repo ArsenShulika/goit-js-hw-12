@@ -30,11 +30,18 @@ searchForm.addEventListener('submit', async e => {
 
   btnLoadMore.addEventListener('click', onLoadMoreClick);
   async function onLoadMoreClick() {
-    showLoader();
-    const obj = await getImages(query, ++currentPage);
-    renderGallery(obj.hits);
-    checkBtnStatus();
-    hideLoader();
+    if (currentPage <= maxPage) {
+      showLoader();
+      const obj = await getImages(query, ++currentPage);
+      renderGallery(obj.hits);
+      checkBtnStatus();
+      hideLoader();
+    }
+    iziToast.error({
+      title: 'Error',
+      message: "We're sorry, but you've reached the end of search results.",
+      position: 'topRight',
+    });
   }
 
   if (!query) {
